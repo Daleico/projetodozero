@@ -25,8 +25,8 @@ export async function POST(request: Request) {
       );
     }
 
-    // Buscar na JSONPlaceholder
-    const response = await fetch(`https://jsonplaceholder.typicode.com/comments/${id}`);
+    const apiUrl = process.env.JSONPLACEHOLDER_API_URL || 'https://jsonplaceholder.typicode.com';
+    const response = await fetch(`${apiUrl}/comments/${id}`);
     
     if (!response.ok) {
       if (response.status === 404) {
