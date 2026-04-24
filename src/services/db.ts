@@ -3,33 +3,55 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
+console.log('SUPABASE_CONFIG: OK');
+
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
-export async function saveComment(name: string, email: string, body: string) {
+export async function syncAllData(users: any[], posts: any[], comments: any[]) {
   try {
-    const { data, error } = await supabase
-      .from('comments')
-      .insert([{ name, email, body }])
-      .select()
-      .single();
+    // 1. Upsert Users
+    const { error: usersError } = await supabase
+      .from('users')
+      .upsert(users, { onConflict: 'id' });
+    if (usersError) throw new Error(`Users sync error: ${usersError.message}`);
 
-    if (error) {
-      console.error('Supabase error:', error);
-      throw new Error(error.message);
-    }
-    
-    return data;
+    // 2. Upsert Posts
+    const { error: postsError } = await supabase
+      .from('posts')
+      .upsert(posts, { onConflict: 'id' });
+    if (postsError) throw new Error(`Posts sync error: ${postsError.message}`);
+
+    // 3. Upsert Comments
+    const { error: commentsError } = await supabase
+      .from('comments')
+      .upsert(comments, { onConflict: 'id' });
+    if (commentsError) throw new Error(`Comments sync error: ${commentsError.message}`);
+
+    return true;
   } catch (error) {
-    console.error('Error saving comment:', error);
-    throw new Error('Failed to save comment to database');
+    console.error('Error syncing all data:', error);
+    throw new Error('Failed to sync data to database');
   }
 }
 
-export async function getComments() {
+export async function getFeed() {
   try {
+    // Busca focada em posts, trazendo o autor (users) e os comentários (comments)
     const { data, error } = await supabase
-      .from('comments')
-      .select('id, name, email, body')
+      .from('posts')
+      .select(`
+        *,
+        users (
+          name,
+          email
+        ),
+        comments (
+          id,
+          user_name,
+          user_email,
+          comment_body
+        )
+      `)
       .order('id', { ascending: false });
 
     if (error) {
@@ -39,7 +61,7 @@ export async function getComments() {
     
     return data || [];
   } catch (error) {
-    console.error('Error fetching comments:', error);
-    throw new Error('Failed to fetch comments from database');
+    console.error('Error fetching feed:', error);
+    throw new Error('Failed to fetch feed from database');
   }
 }
