@@ -29,7 +29,7 @@ export default function DashboardPage() {
 
   const fetchFeed = async () => {
     try {
-      const res = await fetch('/api/feed');
+      const res = await fetch(`/api/feed?t=${Date.now()}`, { cache: 'no-store' });
       if (res.ok) {
         const data = await res.json();
         setPosts(data);

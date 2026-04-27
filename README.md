@@ -12,8 +12,8 @@ O fluxo de ingestão de dados funciona da seguinte forma:
 ## Guia de Autenticação
 O sistema possui uma área administrativa (`/dashboard`) restrita a usuários autenticados.
 
-- **Usuário Admin:** `admin@solargrid.com`
-- **Senha:** `admin123`
+- **Usuários:** Utilize qualquer usuário cadastrado no seu painel do Supabase Auth.
+- **Senha:** A senha definida na criação do usuário no Supabase.
 
 Um **Middleware** protege todas as rotas sob `/dashboard`, interceptando as requisições e verificando a presença de um cookie de sessão válido. Usuários não autenticados são automaticamente redirecionados para a página de login (`/login`).
 
