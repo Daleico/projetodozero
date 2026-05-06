@@ -81,6 +81,12 @@ export default function DashboardPage() {
             </h1>
           </div>
           <div className="flex items-center gap-4">
+            <button
+              onClick={() => router.push('/todos')}
+              className="text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg transition-colors shadow-lg shadow-indigo-500/20"
+            >
+              Tarefas (Todos)
+            </button>
             <div className="text-sm text-slate-300 font-medium hidden sm:block">
               admin@solargrid.com
             </div>
